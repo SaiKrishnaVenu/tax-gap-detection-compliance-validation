@@ -138,7 +138,7 @@ Flyway automatically runs `V1__init_schema.sql` on first startup — creating al
 
 ```bash
 # Clone the repo
-git clone <your-repo-url>
+git clone https://github.com/SaiKrishnaVenu/tax-gap-detection-compliance-validation.git
 cd tax-gap-service
 
 # Build
