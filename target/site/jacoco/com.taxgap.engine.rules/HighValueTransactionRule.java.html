@@ -27,30 +27,31 @@ public class HighValueTransactionRule implements TaxRuleExecutor {
 
     @Override
     public String getRuleName() {
-<span class="fc" id="L30">        return &quot;HIGH_VALUE_TRANSACTION&quot;;</span>
+
+<span class="fc" id="L31">        return &quot;HIGH_VALUE_TRANSACTION&quot;;</span>
     }
 
     @Override
     public Optional&lt;TaxException&gt; execute(Transaction transaction, TaxRule rule) {
         try {
-<span class="fc" id="L36">            JsonNode config = objectMapper.readTree(rule.getConfigJson());</span>
-<span class="fc" id="L37">            BigDecimal threshold = config.get(&quot;threshold&quot;).decimalValue();</span>
+<span class="fc" id="L37">            JsonNode config = objectMapper.readTree(rule.getConfigJson());</span>
+<span class="fc" id="L38">            BigDecimal threshold = config.get(&quot;threshold&quot;).decimalValue();</span>
 
-<span class="pc bpc" id="L39" title="1 of 4 branches missed.">            if (transaction.getAmount() != null &amp;&amp; transaction.getAmount().compareTo(threshold) &gt; 0) {</span>
-<span class="fc" id="L40">                return Optional.of(TaxException.builder()</span>
-<span class="fc" id="L41">                        .transactionId(transaction.getTransactionId())</span>
-<span class="fc" id="L42">                        .customerId(transaction.getCustomerId())</span>
-<span class="fc" id="L43">                        .ruleName(getRuleName())</span>
-<span class="fc" id="L44">                        .severity(rule.getSeverity())</span>
-<span class="fc" id="L45">                        .message(String.format(</span>
+<span class="pc bpc" id="L40" title="1 of 4 branches missed.">            if (transaction.getAmount() != null &amp;&amp; transaction.getAmount().compareTo(threshold) &gt; 0) {</span>
+<span class="fc" id="L41">                return Optional.of(TaxException.builder()</span>
+<span class="fc" id="L42">                        .transactionId(transaction.getTransactionId())</span>
+<span class="fc" id="L43">                        .customerId(transaction.getCustomerId())</span>
+<span class="fc" id="L44">                        .ruleName(getRuleName())</span>
+<span class="fc" id="L45">                        .severity(rule.getSeverity())</span>
+<span class="fc" id="L46">                        .message(String.format(</span>
                                 &quot;Transaction amount %.2f exceeds high-value threshold %.2f&quot;,
-<span class="fc" id="L47">                                transaction.getAmount(), threshold))</span>
-<span class="fc" id="L48">                        .build());</span>
+<span class="fc" id="L48">                                transaction.getAmount(), threshold))</span>
+<span class="fc" id="L49">                        .build());</span>
             }
-<span class="nc" id="L50">        } catch (Exception e) {</span>
-<span class="nc" id="L51">            log.error(&quot;Error executing rule {}: {}&quot;, getRuleName(), e.getMessage());</span>
-<span class="fc" id="L52">        }</span>
-<span class="fc" id="L53">        return Optional.empty();</span>
+<span class="nc" id="L51">        } catch (Exception e) {</span>
+<span class="nc" id="L52">            log.error(&quot;Error executing rule {}: {}&quot;, getRuleName(), e.getMessage());</span>
+<span class="fc" id="L53">        }</span>
+<span class="fc" id="L54">        return Optional.empty();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

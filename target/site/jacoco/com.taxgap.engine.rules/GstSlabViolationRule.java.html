@@ -27,38 +27,39 @@ public class GstSlabViolationRule implements TaxRuleExecutor {
 
     @Override
     public String getRuleName() {
-<span class="fc" id="L30">        return &quot;GST_SLAB_VIOLATION&quot;;</span>
+
+<span class="fc" id="L31">        return &quot;GST_SLAB_VIOLATION&quot;;</span>
     }
 
     @Override
     public Optional&lt;TaxException&gt; execute(Transaction transaction, TaxRule rule) {
-<span class="pc bpc" id="L35" title="2 of 4 branches missed.">        if (transaction.getAmount() == null || transaction.getTaxRate() == null) {</span>
-<span class="nc" id="L36">            return Optional.empty();</span>
+<span class="pc bpc" id="L36" title="2 of 4 branches missed.">        if (transaction.getAmount() == null || transaction.getTaxRate() == null) {</span>
+<span class="nc" id="L37">            return Optional.empty();</span>
         }
         try {
-<span class="fc" id="L39">            JsonNode config = objectMapper.readTree(rule.getConfigJson());</span>
-<span class="fc" id="L40">            BigDecimal slabThreshold = config.get(&quot;slabThreshold&quot;).decimalValue();</span>
-<span class="fc" id="L41">            BigDecimal minTaxRate    = config.get(&quot;minTaxRate&quot;).decimalValue();</span>
+<span class="fc" id="L40">            JsonNode config = objectMapper.readTree(rule.getConfigJson());</span>
+<span class="fc" id="L41">            BigDecimal slabThreshold = config.get(&quot;slabThreshold&quot;).decimalValue();</span>
+<span class="fc" id="L42">            BigDecimal minTaxRate    = config.get(&quot;minTaxRate&quot;).decimalValue();</span>
 
-<span class="fc bfc" id="L43" title="All 2 branches covered.">            boolean aboveSlab      = transaction.getAmount().compareTo(slabThreshold) &gt; 0;</span>
-<span class="fc bfc" id="L44" title="All 2 branches covered.">            boolean taxRateTooLow  = transaction.getTaxRate().compareTo(minTaxRate) &lt; 0;</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">            boolean aboveSlab      = transaction.getAmount().compareTo(slabThreshold) &gt; 0;</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">            boolean taxRateTooLow  = transaction.getTaxRate().compareTo(minTaxRate) &lt; 0;</span>
 
-<span class="fc bfc" id="L46" title="All 4 branches covered.">            if (aboveSlab &amp;&amp; taxRateTooLow) {</span>
-<span class="fc" id="L47">                return Optional.of(TaxException.builder()</span>
-<span class="fc" id="L48">                        .transactionId(transaction.getTransactionId())</span>
-<span class="fc" id="L49">                        .customerId(transaction.getCustomerId())</span>
-<span class="fc" id="L50">                        .ruleName(getRuleName())</span>
-<span class="fc" id="L51">                        .severity(rule.getSeverity())</span>
-<span class="fc" id="L52">                        .message(String.format(</span>
+<span class="fc bfc" id="L47" title="All 4 branches covered.">            if (aboveSlab &amp;&amp; taxRateTooLow) {</span>
+<span class="fc" id="L48">                return Optional.of(TaxException.builder()</span>
+<span class="fc" id="L49">                        .transactionId(transaction.getTransactionId())</span>
+<span class="fc" id="L50">                        .customerId(transaction.getCustomerId())</span>
+<span class="fc" id="L51">                        .ruleName(getRuleName())</span>
+<span class="fc" id="L52">                        .severity(rule.getSeverity())</span>
+<span class="fc" id="L53">                        .message(String.format(</span>
                                 &quot;Amount %.2f exceeds GST slab threshold %.2f but taxRate %.4f is below required %.4f&quot;,
-<span class="fc" id="L54">                                transaction.getAmount(), slabThreshold,</span>
-<span class="fc" id="L55">                                transaction.getTaxRate(), minTaxRate))</span>
-<span class="fc" id="L56">                        .build());</span>
+<span class="fc" id="L55">                                transaction.getAmount(), slabThreshold,</span>
+<span class="fc" id="L56">                                transaction.getTaxRate(), minTaxRate))</span>
+<span class="fc" id="L57">                        .build());</span>
             }
-<span class="nc" id="L58">        } catch (Exception e) {</span>
-<span class="nc" id="L59">            log.error(&quot;Error executing rule {}: {}&quot;, getRuleName(), e.getMessage());</span>
-<span class="fc" id="L60">        }</span>
-<span class="fc" id="L61">        return Optional.empty();</span>
+<span class="nc" id="L59">        } catch (Exception e) {</span>
+<span class="nc" id="L60">            log.error(&quot;Error executing rule {}: {}&quot;, getRuleName(), e.getMessage());</span>
+<span class="fc" id="L61">        }</span>
+<span class="fc" id="L62">        return Optional.empty();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

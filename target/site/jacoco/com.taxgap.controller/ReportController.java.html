@@ -16,16 +16,14 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    /** Customer-level tax summary — totalAmount, taxGap, complianceScore per customer */
     @GetMapping(&quot;/customer-summary&quot;)
     public ResponseEntity&lt;List&lt;CustomerTaxSummary&gt;&gt; customerSummary() {
-<span class="nc" id="L22">        return ResponseEntity.ok(reportService.getCustomerTaxSummary());</span>
+<span class="nc" id="L21">        return ResponseEntity.ok(reportService.getCustomerTaxSummary());</span>
     }
 
-    /** Exception summary — total count, breakdown by severity and by customer */
-    @GetMapping(&quot;/exception-summary&quot;)
+     @GetMapping(&quot;/exception-summary&quot;)
     public ResponseEntity&lt;ExceptionSummaryReport&gt; exceptionSummary() {
-<span class="nc" id="L28">        return ResponseEntity.ok(reportService.getExceptionSummary());</span>
+<span class="nc" id="L26">        return ResponseEntity.ok(reportService.getExceptionSummary());</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

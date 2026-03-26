@@ -153,8 +153,8 @@
                                 <!-- Security -->
                                 <exclude>com/taxgap/security/**</exclude>
 
-                                <!-- Entity -->
-                                <exclude>com/taxgap/domain/entity/**</exclude>
+
+
 
                             </excludes>
                         </configuration>
@@ -162,6 +162,16 @@
                     </execution>
 
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>9.22.3</version>
+                <configuration>
+                    <url>jdbc:mysql://localhost:3306/taxgapdb</url>
+                    <user>root</user>
+                    <password>Sakhi36@</password>
+                </configuration>
             </plugin>
         </plugins>
     </build>

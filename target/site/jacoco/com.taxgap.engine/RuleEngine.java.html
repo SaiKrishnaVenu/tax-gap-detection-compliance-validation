@@ -14,40 +14,34 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * Loads all enabled rules from the DB, matches each to its executor,
- * and collects any exceptions produced.
- */
-<span class="fc" id="L21">@Slf4j</span>
+
+<span class="fc" id="L18">@Slf4j</span>
 @Component
-<span class="fc" id="L23">@RequiredArgsConstructor</span>
+<span class="fc" id="L20">@RequiredArgsConstructor</span>
 public class RuleEngine {
 
     private final TaxRuleRepository ruleRepository;
-    private final List&lt;TaxRuleExecutor&gt; executors;   // Spring auto-injects all beans
+    private final List&lt;TaxRuleExecutor&gt; executors;
 
-    /**
-     * Run all active rules against one transaction.
-     * @return list of exception records (may be empty if fully compliant)
-     */
+
     public List&lt;TaxException&gt; evaluate(Transaction transaction) {
-        // Build a lookup map: ruleName -&gt; executor
-<span class="fc" id="L35">        Map&lt;String, TaxRuleExecutor&gt; executorMap = executors.stream()</span>
-<span class="fc" id="L36">                .collect(Collectors.toMap(TaxRuleExecutor::getRuleName, Function.identity()));</span>
 
-<span class="fc" id="L38">        List&lt;TaxRule&gt; activeRules = ruleRepository.findByEnabledTrue();</span>
-<span class="fc" id="L39">        List&lt;TaxException&gt; exceptions = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L29">        Map&lt;String, TaxRuleExecutor&gt; executorMap = executors.stream()</span>
+<span class="fc" id="L30">                .collect(Collectors.toMap(TaxRuleExecutor::getRuleName, Function.identity()));</span>
 
-<span class="fc bfc" id="L41" title="All 2 branches covered.">        for (TaxRule rule : activeRules) {</span>
-<span class="fc" id="L42">            TaxRuleExecutor executor = executorMap.get(rule.getRuleName());</span>
-<span class="pc bpc" id="L43" title="1 of 2 branches missed.">            if (executor == null) {</span>
-<span class="nc" id="L44">                log.warn(&quot;No executor found for rule: {}&quot;, rule.getRuleName());</span>
-<span class="nc" id="L45">                continue;</span>
+<span class="fc" id="L32">        List&lt;TaxRule&gt; activeRules = ruleRepository.findByEnabledTrue();</span>
+<span class="fc" id="L33">        List&lt;TaxException&gt; exceptions = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L35" title="All 2 branches covered.">        for (TaxRule rule : activeRules) {</span>
+<span class="fc" id="L36">            TaxRuleExecutor executor = executorMap.get(rule.getRuleName());</span>
+<span class="pc bpc" id="L37" title="1 of 2 branches missed.">            if (executor == null) {</span>
+<span class="nc" id="L38">                log.warn(&quot;No executor found for rule: {}&quot;, rule.getRuleName());</span>
+<span class="nc" id="L39">                continue;</span>
             }
-<span class="fc" id="L47">            log.debug(&quot;Executing rule {} for transaction {}&quot;, rule.getRuleName(), transaction.getTransactionId());</span>
-<span class="fc" id="L48">            executor.execute(transaction, rule).ifPresent(exceptions::add);</span>
-<span class="fc" id="L49">        }</span>
-<span class="fc" id="L50">        return exceptions;</span>
+<span class="fc" id="L41">            log.debug(&quot;Executing rule {} for transaction {}&quot;, rule.getRuleName(), transaction.getTransactionId());</span>
+<span class="fc" id="L42">            executor.execute(transaction, rule).ifPresent(exceptions::add);</span>
+<span class="fc" id="L43">        }</span>
+<span class="fc" id="L44">        return exceptions;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

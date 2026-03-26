@@ -7,45 +7,40 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Validates each raw TransactionRequest before it is persisted.
- * Returns a list of failure reasons; empty list means the transaction is valid.
- */
+
 @Component
-<span class="fc" id="L15">public class ValidationEngine {</span>
+<span class="fc" id="L12">public class ValidationEngine {</span>
 
     public List&lt;String&gt; validate(TransactionRequest req) {
-<span class="fc" id="L18">        List&lt;String&gt; errors = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L15">        List&lt;String&gt; errors = new ArrayList&lt;&gt;();</span>
 
         // Required fields
-<span class="fc bfc" id="L21" title="All 4 branches covered.">        if (req.getTransactionId() == null || req.getTransactionId().isBlank()) {</span>
-<span class="fc" id="L22">            errors.add(&quot;transactionId is required&quot;);</span>
+<span class="fc bfc" id="L18" title="All 4 branches covered.">        if (req.getTransactionId() == null || req.getTransactionId().isBlank()) {</span>
+<span class="fc" id="L19">            errors.add(&quot;transactionId is required&quot;);</span>
         }
-<span class="fc bfc" id="L24" title="All 2 branches covered.">        if (req.getDate() == null) {</span>
-<span class="fc" id="L25">            errors.add(&quot;date is required&quot;);</span>
+<span class="fc bfc" id="L21" title="All 2 branches covered.">        if (req.getDate() == null) {</span>
+<span class="fc" id="L22">            errors.add(&quot;date is required&quot;);</span>
         }
-<span class="pc bpc" id="L27" title="1 of 4 branches missed.">        if (req.getCustomerId() == null || req.getCustomerId().isBlank()) {</span>
-<span class="fc" id="L28">            errors.add(&quot;customerId is required&quot;);</span>
+<span class="pc bpc" id="L24" title="1 of 4 branches missed.">        if (req.getCustomerId() == null || req.getCustomerId().isBlank()) {</span>
+<span class="fc" id="L25">            errors.add(&quot;customerId is required&quot;);</span>
         }
-<span class="fc bfc" id="L30" title="All 2 branches covered.">        if (req.getTransactionType() == null) {</span>
-<span class="fc" id="L31">            errors.add(&quot;transactionType is required (SALE / REFUND / EXPENSE)&quot;);</span>
-        }
-
-        // Amount must be present and &gt; 0
-<span class="fc bfc" id="L35" title="All 2 branches covered.">        if (req.getAmount() == null) {</span>
-<span class="fc" id="L36">            errors.add(&quot;amount is required&quot;);</span>
-<span class="fc bfc" id="L37" title="All 2 branches covered.">        } else if (req.getAmount().compareTo(BigDecimal.ZERO) &lt;= 0) {</span>
-<span class="fc" id="L38">            errors.add(&quot;amount must be greater than 0&quot;);</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        if (req.getTransactionType() == null) {</span>
+<span class="fc" id="L28">            errors.add(&quot;transactionType is required (SALE / REFUND / EXPENSE)&quot;);</span>
         }
 
-        // taxRate must be present and non-negative
-<span class="fc bfc" id="L42" title="All 2 branches covered.">        if (req.getTaxRate() == null) {</span>
-<span class="fc" id="L43">            errors.add(&quot;taxRate is required&quot;);</span>
-<span class="fc bfc" id="L44" title="All 2 branches covered.">        } else if (req.getTaxRate().compareTo(BigDecimal.ZERO) &lt; 0) {</span>
-<span class="fc" id="L45">            errors.add(&quot;taxRate must be &gt;= 0&quot;);</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">         if (req.getAmount() == null) {</span>
+<span class="fc" id="L32">            errors.add(&quot;amount is required&quot;);</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        } else if (req.getAmount().compareTo(BigDecimal.ZERO) &lt;= 0) {</span>
+<span class="fc" id="L34">            errors.add(&quot;amount must be greater than 0&quot;);</span>
         }
 
-<span class="fc" id="L48">        return errors;</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">         if (req.getTaxRate() == null) {</span>
+<span class="fc" id="L38">            errors.add(&quot;taxRate is required&quot;);</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        } else if (req.getTaxRate().compareTo(BigDecimal.ZERO) &lt; 0) {</span>
+<span class="fc" id="L40">            errors.add(&quot;taxRate must be &gt;= 0&quot;);</span>
+        }
+
+<span class="fc" id="L43">        return errors;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

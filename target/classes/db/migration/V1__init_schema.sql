@@ -1,4 +1,4 @@
--- V1__init_schema.sql
+-- V1__init_schema.sql  (MySQL compatible)
 
 CREATE TABLE IF NOT EXISTS users (
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -75,12 +75,12 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     INDEX idx_audit_event (event_type)
 );
 
---Seed users  (password = 'password' BCrypt encoded) --
+-- ─── Seed users  (password = 'password' BCrypt encoded) ───
 INSERT IGNORE INTO users (username, password, role) VALUES
 ('admin',   '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ROLE_ADMIN'),
 ('auditor', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ROLE_AUDITOR');
 
---Seed tax rules --
+-- ─── Seed tax rules ───
 INSERT IGNORE INTO tax_rules (rule_name, description, enabled, config_json, severity) VALUES
 ('HIGH_VALUE_TRANSACTION',
  'Flag transactions whose amount exceeds a configurable threshold',

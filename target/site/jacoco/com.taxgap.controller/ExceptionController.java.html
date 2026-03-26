@@ -16,19 +16,13 @@ public class ExceptionController {
 
     private final ExceptionService exceptionService;
 
-    /**
-     * Get exceptions with optional filters:
-     *  ?customerId=C001
-     *  ?severity=HIGH
-     *  ?ruleName=GST_SLAB_VIOLATION
-     *  ?customerId=C001&amp;severity=HIGH
-     */
+
     @GetMapping
     public ResponseEntity&lt;List&lt;ExceptionResponse&gt;&gt; getExceptions(
             @RequestParam(required = false) String customerId,
             @RequestParam(required = false) Severity severity,
             @RequestParam(required = false) String ruleName) {
-<span class="nc" id="L31">        return ResponseEntity.ok(exceptionService.filter(customerId, severity, ruleName));</span>
+<span class="nc" id="L25">        return ResponseEntity.ok(exceptionService.filter(customerId, severity, ruleName));</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

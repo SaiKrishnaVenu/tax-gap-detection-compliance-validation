@@ -18,24 +18,21 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
-    /** Upload a batch of transactions — validates, computes tax gap, runs rules */
     @PostMapping(&quot;/batch&quot;)
     public ResponseEntity&lt;BatchUploadResponse&gt; uploadBatch(
             @Valid @RequestBody BatchTransactionRequest request) {
-<span class="nc" id="L25">        return ResponseEntity.ok(transactionService.processBatch(request));</span>
+<span class="nc" id="L24">        return ResponseEntity.ok(transactionService.processBatch(request));</span>
     }
 
-    /** List all transactions with their tax results */
     @GetMapping
     public ResponseEntity&lt;List&lt;TransactionResponse&gt;&gt; getAll() {
 
-<span class="nc" id="L32">        return ResponseEntity.ok(transactionService.getAll());</span>
+<span class="nc" id="L30">        return ResponseEntity.ok(transactionService.getAll());</span>
     }
 
-    /** Get a single transaction by transactionId */
     @GetMapping(&quot;/{transactionId}&quot;)
     public ResponseEntity&lt;TransactionResponse&gt; getById(@PathVariable String transactionId) {
-<span class="nc" id="L38">        return ResponseEntity.ok(transactionService.getById(transactionId));</span>
+<span class="nc" id="L35">        return ResponseEntity.ok(transactionService.getById(transactionId));</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
