@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# tax-gap-detection-compliance-validation
-The Tax Gap Detection &amp; Compliance Validation Service is a backend system designed to assist tax auditors in validating financial transactions submitted by customers. It ensures data accuracy, identifies discrepancies in reported tax, and enforces compliance through configurable business rules.
-=======
 # Tax Gap Detection & Compliance Validation Service
 
 A Spring Boot backend service for tax auditors to detect tax gaps, validate financial transactions, run configurable rule-based compliance checks, and generate audit trails and summary reports.
@@ -11,7 +7,7 @@ A Spring Boot backend service for tax auditors to detect tax gaps, validate fina
 ## Tech Stack
 
 | Layer | Technology |
-|---|---|
+|-------|-----------|
 | Language | Java 17 |
 | Framework | Spring Boot 3.2 |
 | Security | Spring Security + JWT |
@@ -52,26 +48,88 @@ src/main/java/com/taxgap/
 
 ---
 
+## Database Schema
+
+```mermaid
+erDiagram
+  TRANSACTIONS {
+    bigint id PK
+    varchar transaction_id UK
+    date date
+    varchar customer_id
+    decimal amount
+    decimal tax_rate
+    decimal reported_tax
+    varchar transaction_type
+    varchar validation_status
+    text failure_reasons
+    timestamp created_at
+  }
+  TAX_RESULTS {
+    bigint id PK
+    varchar transaction_id FK
+    decimal expected_tax
+    decimal tax_gap
+    varchar compliance_status
+    timestamp computed_at
+  }
+  TAX_RULES {
+    bigint id PK
+    varchar rule_name UK
+    text description
+    boolean enabled
+    varchar severity
+    text config_json
+  }
+  EXCEPTIONS {
+    bigint id PK
+    varchar transaction_id
+    varchar customer_id
+    varchar rule_name
+    varchar severity
+    text message
+    timestamp created_at
+  }
+  AUDIT_LOGS {
+    bigint id PK
+    varchar event_type
+    varchar transaction_id
+    timestamp timestamp
+    text detail_json
+  }
+  APP_USERS {
+    bigint id PK
+    varchar username UK
+    varchar password
+    varchar role
+  }
+
+  TRANSACTIONS ||--|| TAX_RESULTS : "has"
+  TRANSACTIONS ||--o{ EXCEPTIONS : "generates"
+  TRANSACTIONS ||--o{ AUDIT_LOGS : "logs"
+  TAX_RULES ||--o{ EXCEPTIONS : "triggers"
+```
+
+---
+
 ## Database Setup (MySQL)
 
-### 1. Create the database
-
+**1. Create the database**
 ```sql
 CREATE DATABASE taxgapdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-### 2. Update credentials in `application.properties`
-
+**2. Update credentials in `application.properties`**
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/taxgapdb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
 spring.datasource.username=root
 spring.datasource.password=your_password
 ```
 
-### 3. Run the application
+**3. Run the application**
 
 Flyway automatically runs `V1__init_schema.sql` on first startup — creating all tables and seeding:
-- Two users: `admin` (ROLE_ADMIN) and `auditor` (ROLE_AUDITOR), both with password `password`
+- Two users: `admin` (`ROLE_ADMIN`) and `auditor` (`ROLE_AUDITOR`), both with password `password`
 - Three tax rules: `HIGH_VALUE_TRANSACTION`, `REFUND_VALIDATION`, `GST_SLAB_VIOLATION`
 
 ---
@@ -118,10 +176,11 @@ open target/site/jacoco/index.html
 All endpoints (except `/api/auth/login`) require a Bearer JWT token.
 
 #### Login
-```bash
+```http
 POST /api/auth/login
 Content-Type: application/json
-
+```
+```json
 {
   "username": "auditor",
   "password": "password"
@@ -137,7 +196,7 @@ Response:
 }
 ```
 
-Use the token in subsequent requests:
+Use the token in all subsequent requests:
 ```
 Authorization: Bearer <token>
 ```
@@ -147,11 +206,12 @@ Authorization: Bearer <token>
 ### Transaction Upload
 
 #### Upload a batch of transactions
-```bash
+```http
 POST /api/transactions/batch
 Authorization: Bearer <token>
 Content-Type: application/json
-
+```
+```json
 {
   "transactions": [
     {
@@ -186,14 +246,14 @@ Content-Type: application/json
 ```
 
 #### Get all transactions
-```bash
+```http
 GET /api/transactions
 Authorization: Bearer <token>
 ```
 
 #### Get single transaction
-```bash
-GET /api/transactions/TXN-001
+```http
+GET /api/transactions/{transactionId}
 Authorization: Bearer <token>
 ```
 
@@ -201,7 +261,7 @@ Authorization: Bearer <token>
 
 ### Exceptions
 
-```bash
+```http
 # All exceptions
 GET /api/exceptions
 Authorization: Bearer <token>
@@ -212,7 +272,7 @@ GET /api/exceptions?customerId=CUST-001
 # Filter by severity
 GET /api/exceptions?severity=HIGH
 
-# Filter by rule
+# Filter by rule name
 GET /api/exceptions?ruleName=GST_SLAB_VIOLATION
 
 # Combined filter
@@ -223,7 +283,7 @@ GET /api/exceptions?customerId=CUST-001&severity=HIGH
 
 ### Reports
 
-```bash
+```http
 # Customer tax summary (complianceScore, totalTaxGap, etc.)
 GET /api/reports/customer-summary
 Authorization: Bearer <token>
@@ -237,30 +297,15 @@ Authorization: Bearer <token>
 
 ### Audit Logs
 
-```bash
+```http
 # All audit logs
 GET /api/audit
 Authorization: Bearer <token>
 
 # Audit logs for a specific transaction
-GET /api/audit/TXN-001
+GET /api/audit/{transactionId}
 Authorization: Bearer <token>
 ```
-
----
-
-## Database Schema
-
-### Tables
-
-| Table | Purpose |
-|---|---|
-| `users` | Prefilled auditor/admin accounts for Spring Security |
-| `transactions` | Raw uploaded transactions + validation status |
-| `tax_results` | Computed expectedTax, taxGap, complianceStatus |
-| `tax_rules` | Configurable rules stored as JSON (enable/disable without redeployment) |
-| `exceptions` | Rule violations per transaction |
-| `audit_logs` | Full audit trail for ingestion, tax computation, rule execution |
 
 ---
 
@@ -270,23 +315,23 @@ Authorization: Bearer <token>
 expectedTax = amount × taxRate
 taxGap      = expectedTax − reportedTax
 
-|taxGap| ≤ 1  → COMPLIANT
-taxGap  > 1   → UNDERPAID
-taxGap  < −1  → OVERPAID
-reportedTax missing → NON_COMPLIANT
+|taxGap| ≤ 1  →  COMPLIANT
+taxGap  > 1   →  UNDERPAID
+taxGap  < −1  →  OVERPAID
+reportedTax missing  →  NON_COMPLIANT
 ```
 
 ---
 
 ## Compliance Rules
 
-| Rule | Trigger | Severity |
-|---|---|---|
-| `HIGH_VALUE_TRANSACTION` | amount > 100,000 | HIGH |
-| `REFUND_VALIDATION` | REFUND amount > 50,000 | MEDIUM |
-| `GST_SLAB_VIOLATION` | amount > 10,000 AND taxRate < 0.18 | HIGH |
+| Rule | Trigger Condition | Severity |
+|------|-------------------|----------|
+| `HIGH_VALUE_TRANSACTION` | `amount > 100,000` | HIGH |
+| `REFUND_VALIDATION` | REFUND `amount > 50,000` | MEDIUM |
+| `GST_SLAB_VIOLATION` | `amount > 10,000` AND `taxRate < 0.18` | HIGH |
 
-Rules are stored in the `tax_rules` table with JSON config. They can be enabled/disabled without redeployment. Adding a new rule requires: (1) implementing `TaxRuleExecutor`, (2) inserting a row in `tax_rules`.
+Rules are stored in the `tax_rules` table with a JSON config column. They can be **enabled or disabled without redeployment** by updating the `enabled` flag in the database. Adding a new rule requires: (1) implementing `TaxRuleExecutor`, and (2) inserting a row in `tax_rules`.
 
 ---
 
@@ -298,7 +343,7 @@ Rules are stored in the `tax_rules` table with JSON config. They can be enabled/
 
 ---
 
-## Architecture Summary
+## Architecture
 
 ```
 Client
@@ -309,15 +354,14 @@ Controller Layer       ← REST endpoints, request/response mapping
   ▼
 Service Layer          ← Business orchestration, transaction management
   │
-  ├──► ValidationEngine   ← Field-level validation
-  ├──► TaxGapCalculator   ← Pure tax math (no DB)
-  ├──► RuleEngine         ← Loads active rules from DB, runs all executors
-  └──► AuditService       ← Writes audit trail for every step
+  ├──► ValidationEngine    ← Field-level validation
+  ├──► TaxGapCalculator    ← Pure tax math (no DB calls)
+  ├──► RuleEngine          ← Loads active rules from DB, runs all executors
+  └──► AuditService        ← Writes audit trail for every step
   │
   ▼
-Repository Layer       ← JPA/Hibernate, Spring Data
+Repository Layer       ← JPA / Hibernate, Spring Data
   │
   ▼
 MySQL Database
 ```
->>>>>>> 1af021e (Added the Tax gap detection and Compliation validation services and entities)
