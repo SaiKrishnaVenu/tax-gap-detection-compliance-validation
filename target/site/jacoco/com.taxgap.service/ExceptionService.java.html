@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExceptionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Tax Gap Detection &amp; Compliance Validation Service</a> &gt; <a href="index.source.html" class="el_package">com.taxgap.service</a> &gt; <span class="el_source">ExceptionService.java</span></div><h1>ExceptionService.java</h1><pre class="source lang-java linenums">package com.taxgap.service;
+
+import com.taxgap.domain.entity.TaxException;
+import com.taxgap.domain.enums.Severity;
+import com.taxgap.dto.response.ExceptionResponse;
+import com.taxgap.repository.TaxExceptionRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+<span class="fc" id="L14">@RequiredArgsConstructor</span>
+public class ExceptionService {
+
+    private final TaxExceptionRepository exceptionRepository;
+
+    public void saveAll(List&lt;TaxException&gt; exceptions) {
+<span class="fc" id="L20">        exceptionRepository.saveAll(exceptions);</span>
+<span class="fc" id="L21">    }</span>
+
+    public List&lt;ExceptionResponse&gt; getAll() {
+<span class="fc" id="L24">        return exceptionRepository.findAll().stream()</span>
+<span class="fc" id="L25">                .map(this::toResponse)</span>
+<span class="fc" id="L26">                .collect(Collectors.toList());</span>
+    }
+
+    public List&lt;ExceptionResponse&gt; getByCustomer(String customerId) {
+<span class="fc" id="L30">        return exceptionRepository.findByCustomerId(customerId).stream()</span>
+<span class="fc" id="L31">                .map(this::toResponse)</span>
+<span class="fc" id="L32">                .collect(Collectors.toList());</span>
+    }
+
+    public List&lt;ExceptionResponse&gt; getBySeverity(Severity severity) {
+<span class="fc" id="L36">        return exceptionRepository.findBySeverity(severity).stream()</span>
+<span class="fc" id="L37">                .map(this::toResponse)</span>
+<span class="fc" id="L38">                .collect(Collectors.toList());</span>
+    }
+
+    public List&lt;ExceptionResponse&gt; getByRuleName(String ruleName) {
+<span class="fc" id="L42">        return exceptionRepository.findByRuleName(ruleName).stream()</span>
+<span class="fc" id="L43">                .map(this::toResponse)</span>
+<span class="fc" id="L44">                .collect(Collectors.toList());</span>
+    }
+
+    public List&lt;ExceptionResponse&gt; filter(String customerId, Severity severity, String ruleName) {
+<span class="pc bpc" id="L48" title="1 of 4 branches missed.">        if (customerId != null &amp;&amp; severity != null) {</span>
+<span class="fc" id="L49">            return exceptionRepository.findByCustomerIdAndSeverity(customerId, severity)</span>
+<span class="fc" id="L50">                    .stream().map(this::toResponse).collect(Collectors.toList());</span>
+        }
+<span class="pc bpc" id="L52" title="3 of 4 branches missed.">        if (customerId != null &amp;&amp; ruleName != null) {</span>
+<span class="nc" id="L53">            return exceptionRepository.findByCustomerIdAndRuleName(customerId, ruleName)</span>
+<span class="nc" id="L54">                    .stream().map(this::toResponse).collect(Collectors.toList());</span>
+        }
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">        if (customerId != null) return getByCustomer(customerId);</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">        if (severity   != null) return getBySeverity(severity);</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if (ruleName   != null) return getByRuleName(ruleName);</span>
+<span class="fc" id="L59">        return getAll();</span>
+    }
+
+    private ExceptionResponse toResponse(TaxException e) {
+<span class="fc" id="L63">        return ExceptionResponse.builder()</span>
+<span class="fc" id="L64">                .id(e.getId())</span>
+<span class="fc" id="L65">                .transactionId(e.getTransactionId())</span>
+<span class="fc" id="L66">                .customerId(e.getCustomerId())</span>
+<span class="fc" id="L67">                .ruleName(e.getRuleName())</span>
+<span class="fc" id="L68">                .severity(e.getSeverity())</span>
+<span class="fc" id="L69">                .message(e.getMessage())</span>
+<span class="fc" id="L70">                .createdAt(e.getCreatedAt())</span>
+<span class="fc" id="L71">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

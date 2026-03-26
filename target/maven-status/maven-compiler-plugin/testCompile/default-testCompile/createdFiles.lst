@@ -1,0 +1,12 @@
+com\taxgap\dto\BatchUploadResponseTest.class
+com\taxgap\service\ExceptionServiceTest.class
+com\taxgap\service\TransactionServiceTest.class
+com\taxgap\domain\entity\TransactionTest.class
+com\taxgap\engine\RuleEngineTest.class
+com\taxgap\engine\TaxGapCalculatorTest.class
+com\taxgap\dto\TransactionResponseTest.class
+com\taxgap\domain\entity\TaxResultTest.class
+com\taxgap\controller\TransactionControllerTest.class
+com\taxgap\exception\GlobalExceptionHandlerTest.class
+com\taxgap\engine\ValidationEngineTest.class
+com\taxgap\service\ReportServiceTest.class

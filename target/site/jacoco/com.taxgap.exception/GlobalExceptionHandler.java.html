@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Tax Gap Detection &amp; Compliance Validation Service</a> &gt; <a href="index.source.html" class="el_package">com.taxgap.exception</a> &gt; <span class="el_source">GlobalExceptionHandler.java</span></div><h1>GlobalExceptionHandler.java</h1><pre class="source lang-java linenums">package com.taxgap.exception;
+
+import org.springframework.http.*;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.*;
+
+@RestControllerAdvice
+<span class="fc" id="L14">public class GlobalExceptionHandler {</span>
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleValidation(MethodArgumentNotValidException ex) {
+<span class="nc" id="L18">        Map&lt;String, String&gt; fieldErrors = new LinkedHashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L19" title="All 2 branches missed.">        for (FieldError fe : ex.getBindingResult().getFieldErrors()) {</span>
+<span class="nc" id="L20">            fieldErrors.put(fe.getField(), fe.getDefaultMessage());</span>
+<span class="nc" id="L21">        }</span>
+<span class="nc" id="L22">        return buildError(HttpStatus.BAD_REQUEST, &quot;Validation failed&quot;, fieldErrors);</span>
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleRuntime(RuntimeException ex) {
+<span class="fc" id="L27">        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), null);</span>
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleAccessDenied(AccessDeniedException ex) {
+<span class="nc" id="L32">        return buildError(HttpStatus.FORBIDDEN, &quot;Access denied&quot;, null);</span>
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleAuth(AuthenticationException ex) {
+<span class="nc" id="L37">        return buildError(HttpStatus.UNAUTHORIZED, &quot;Authentication failed: &quot; + ex.getMessage(), null);</span>
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleGeneral(Exception ex) {
+<span class="fc" id="L42">        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, &quot;An unexpected error occurred&quot;, null);</span>
+    }
+
+    private ResponseEntity&lt;Map&lt;String, Object&gt;&gt; buildError(HttpStatus status, String message, Object details) {
+<span class="fc" id="L46">        Map&lt;String, Object&gt; body = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L47">        body.put(&quot;timestamp&quot;, LocalDateTime.now().toString());</span>
+<span class="fc" id="L48">        body.put(&quot;status&quot;, status.value());</span>
+<span class="fc" id="L49">        body.put(&quot;error&quot;, status.getReasonPhrase());</span>
+<span class="fc" id="L50">        body.put(&quot;message&quot;, message);</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        if (details != null) body.put(&quot;details&quot;, details);</span>
+<span class="fc" id="L52">        return ResponseEntity.status(status).body(body);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

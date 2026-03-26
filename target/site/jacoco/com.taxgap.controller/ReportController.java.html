@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReportController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Tax Gap Detection &amp; Compliance Validation Service</a> &gt; <a href="index.source.html" class="el_package">com.taxgap.controller</a> &gt; <span class="el_source">ReportController.java</span></div><h1>ReportController.java</h1><pre class="source lang-java linenums">package com.taxgap.controller;
+
+import com.taxgap.dto.response.CustomerTaxSummary;
+import com.taxgap.dto.response.ExceptionSummaryReport;
+import com.taxgap.service.ReportService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/api/reports&quot;)
+<span class="nc" id="L14">@RequiredArgsConstructor</span>
+public class ReportController {
+
+    private final ReportService reportService;
+
+    /** Customer-level tax summary — totalAmount, taxGap, complianceScore per customer */
+    @GetMapping(&quot;/customer-summary&quot;)
+    public ResponseEntity&lt;List&lt;CustomerTaxSummary&gt;&gt; customerSummary() {
+<span class="nc" id="L22">        return ResponseEntity.ok(reportService.getCustomerTaxSummary());</span>
+    }
+
+    /** Exception summary — total count, breakdown by severity and by customer */
+    @GetMapping(&quot;/exception-summary&quot;)
+    public ResponseEntity&lt;ExceptionSummaryReport&gt; exceptionSummary() {
+<span class="nc" id="L28">        return ResponseEntity.ok(reportService.getExceptionSummary());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

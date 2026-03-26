@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReportService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Tax Gap Detection &amp; Compliance Validation Service</a> &gt; <a href="index.source.html" class="el_package">com.taxgap.service</a> &gt; <span class="el_source">ReportService.java</span></div><h1>ReportService.java</h1><pre class="source lang-java linenums">package com.taxgap.service;
+
+import com.taxgap.dto.response.CustomerTaxSummary;
+import com.taxgap.dto.response.ExceptionSummaryReport;
+import com.taxgap.repository.TaxExceptionRepository;
+import com.taxgap.repository.TaxResultRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Service
+<span class="fc" id="L18">@RequiredArgsConstructor</span>
+public class ReportService {
+
+    private final TaxResultRepository   taxResultRepository;
+    private final TaxExceptionRepository exceptionRepository;
+
+    public List&lt;CustomerTaxSummary&gt; getCustomerTaxSummary() {
+        // Native aggregation query — efficient on real SQL DB
+<span class="fc" id="L26">        List&lt;Object[]&gt; rows = taxResultRepository.findCustomerTaxSummary();</span>
+
+<span class="fc" id="L28">        return rows.stream().map(row -&gt; {</span>
+<span class="fc" id="L29">            String customerId          = (String)  row[0];</span>
+<span class="fc" id="L30">            BigDecimal totalAmount     = toBD(row[1]);</span>
+<span class="fc" id="L31">            BigDecimal totalReported   = toBD(row[2]);</span>
+<span class="fc" id="L32">            BigDecimal totalExpected   = toBD(row[3]);</span>
+<span class="fc" id="L33">            BigDecimal totalGap        = toBD(row[4]);</span>
+<span class="fc" id="L34">            long totalTxns             = toLong(row[5]);</span>
+<span class="fc" id="L35">            long nonCompliant          = toLong(row[6]);</span>
+
+<span class="fc bfc" id="L37" title="All 2 branches covered.">            double complianceScore = totalTxns == 0 ? 100.0</span>
+<span class="fc" id="L38">                    : 100.0 - ((double) nonCompliant / totalTxns * 100.0);</span>
+
+<span class="fc" id="L40">            return CustomerTaxSummary.builder()</span>
+<span class="fc" id="L41">                    .customerId(customerId)</span>
+<span class="fc" id="L42">                    .totalAmount(totalAmount)</span>
+<span class="fc" id="L43">                    .totalReportedTax(totalReported)</span>
+<span class="fc" id="L44">                    .totalExpectedTax(totalExpected)</span>
+<span class="fc" id="L45">                    .totalTaxGap(totalGap)</span>
+<span class="fc" id="L46">                    .totalTransactions(totalTxns)</span>
+<span class="fc" id="L47">                    .nonCompliantTransactions(nonCompliant)</span>
+<span class="fc" id="L48">                    .complianceScore(BigDecimal.valueOf(complianceScore)</span>
+<span class="fc" id="L49">                            .setScale(2, RoundingMode.HALF_UP).doubleValue())</span>
+<span class="fc" id="L50">                    .build();</span>
+<span class="fc" id="L51">        }).collect(Collectors.toList());</span>
+    }
+
+    public ExceptionSummaryReport getExceptionSummary() {
+<span class="fc" id="L55">        long total = exceptionRepository.count();</span>
+
+<span class="fc" id="L57">        Map&lt;String, Long&gt; bySeverity = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L58">        exceptionRepository.countBySeverity()</span>
+<span class="fc" id="L59">                .forEach(row -&gt; bySeverity.put(row[0].toString(), (Long) row[1]));</span>
+
+<span class="fc" id="L61">        Map&lt;String, Long&gt; byCustomer = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L62">        exceptionRepository.countByCustomer()</span>
+<span class="fc" id="L63">                .forEach(row -&gt; byCustomer.put(row[0].toString(), (Long) row[1]));</span>
+
+<span class="fc" id="L65">        return ExceptionSummaryReport.builder()</span>
+<span class="fc" id="L66">                .totalExceptions(total)</span>
+<span class="fc" id="L67">                .countBySeverity(bySeverity)</span>
+<span class="fc" id="L68">                .countByCustomer(byCustomer)</span>
+<span class="fc" id="L69">                .build();</span>
+    }
+
+    private BigDecimal toBD(Object val) {
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">        if (val == null) return BigDecimal.ZERO;</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if (val instanceof BigDecimal bd) return bd;</span>
+<span class="nc" id="L75">        return new BigDecimal(val.toString());</span>
+    }
+
+    private long toLong(Object val) {
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">        if (val == null) return 0L;</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        if (val instanceof Long l) return l;</span>
+<span class="nc" id="L81">        return Long.parseLong(val.toString());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

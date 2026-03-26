@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TransactionController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Tax Gap Detection &amp; Compliance Validation Service</a> &gt; <a href="index.source.html" class="el_package">com.taxgap.controller</a> &gt; <span class="el_source">TransactionController.java</span></div><h1>TransactionController.java</h1><pre class="source lang-java linenums">package com.taxgap.controller;
+
+import com.taxgap.dto.request.BatchTransactionRequest;
+import com.taxgap.dto.response.BatchUploadResponse;
+import com.taxgap.dto.response.TransactionResponse;
+import com.taxgap.service.TransactionService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/api/transactions&quot;)
+<span class="fc" id="L16">@RequiredArgsConstructor</span>
+public class TransactionController {
+
+    private final TransactionService transactionService;
+
+    /** Upload a batch of transactions — validates, computes tax gap, runs rules */
+    @PostMapping(&quot;/batch&quot;)
+    public ResponseEntity&lt;BatchUploadResponse&gt; uploadBatch(
+            @Valid @RequestBody BatchTransactionRequest request) {
+<span class="nc" id="L25">        return ResponseEntity.ok(transactionService.processBatch(request));</span>
+    }
+
+    /** List all transactions with their tax results */
+    @GetMapping
+    public ResponseEntity&lt;List&lt;TransactionResponse&gt;&gt; getAll() {
+
+<span class="nc" id="L32">        return ResponseEntity.ok(transactionService.getAll());</span>
+    }
+
+    /** Get a single transaction by transactionId */
+    @GetMapping(&quot;/{transactionId}&quot;)
+    public ResponseEntity&lt;TransactionResponse&gt; getById(@PathVariable String transactionId) {
+<span class="nc" id="L38">        return ResponseEntity.ok(transactionService.getById(transactionId));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
